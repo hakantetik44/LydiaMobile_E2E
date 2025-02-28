@@ -1,6 +1,7 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/hakantetik44/WiglMobile_E2E/main/wigl-logo.png" width="400px">
+# 💎 WIGL 💰
+*Finance & Crypto Made Simple*
 
 # 🌟 Tests E2E Web & Mobile Wigl
 
@@ -42,7 +43,7 @@ Framework de tests end-to-end pour l'application Wigl. Cette suite de tests auto
 ## 📋 Prérequis
 
 ### 🌐 Tests Web
-- ☕ Java JDK 11+
+- ☕ Java JDK 17
 - 🎯 Maven 3.8.x+
 - 🌐 Navigateurs :
   - Chrome
@@ -239,7 +240,8 @@ Copyright © 2025 [Aareon France](https://www.aareon.fr/). Tous droits réservé
 
 ---
 
-<img src="https://raw.githubusercontent.com/hakantetik44/WiglMobile_E2E/main/wigl-logo.png" width="200px">
+# 💎 WIGL 💰
+*Finance & Crypto Made Simple*
 
 *Développé avec ❤️ par l'équipe QA de Wigl*
 
