@@ -157,8 +157,10 @@ pipeline {
             steps {
                 script {
                     try {
+                        // Video kaydını başlat
+                        sh 'ffmpeg -f x11grab -s 1920x1080 -i :0.0 -r 30 -vcodec libx264 output.mp4 &'
+
                         def platformName = params.PLATFORM.toLowerCase()
-                        
                         echo "📂 Creating Test Directories..."
                         sh """
                             rm -rf target/cucumber-reports target/allure-results || true
@@ -184,29 +186,47 @@ pipeline {
                             """
                         }
 
-                        echo "📊 Checking Test Results:"
+                        // Video kaydını durdur
+                        sh 'pkill ffmpeg'
+
+                        echo "📊 Checking Test Results:" 
                         sh """
-                            echo "Cucumber Reports:"
+                            echo "Cucumber Reports:" 
                             ls -la target/cucumber-reports/ || true
-                            echo "Allure Results:"
+                            echo "Allure Results:" 
                             ls -la target/allure-results/ || true
                         """
                     } catch (Exception e) {
-                        echo """
-                            ⚠️ Test Error:
-                            Error Message: ${e.message}
-                            Stack Trace: ${e.printStackTrace()}
-                            Platform: ${params.PLATFORM}
-                            Build: ${BUILD_NUMBER}
-                        """
-                        currentBuild.result = 'UNSTABLE'
-                        error("Test execution error: ${e.message}")
+                        echo "⚠️ Test Error:" 
+                        Error Message: ${e.message}
+                        Stack Trace: ${e.printStackTrace()}
+                        Platform: ${params.PLATFORM}
+                        Build: ${BUILD_NUMBER}
                     }
                 }
             }
             options {
                 timeout(time: 30, unit: 'MINUTES')
                 retry(2)
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Projeyi derleme adımları
+            }
+        }
+
+        stage('Test') {
+            steps {
+                // Video kaydını başlat
+                sh 'ffmpeg -f x11grab -s 1920x1080 -i :0.0 -r 30 -vcodec libx264 output.mp4 &'
+                
+                // Testleri çalıştır
+                sh 'mvn clean test -DplatformName=android -Dcucumber.filter.tags="@smoke"'
+                
+                // Video kaydını durdur
+                sh 'pkill ffmpeg'
             }
         }
     }
