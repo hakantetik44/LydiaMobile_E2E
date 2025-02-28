@@ -1,1 +1,0 @@
-file:src/test/resources/features/wigl_login.feature:8

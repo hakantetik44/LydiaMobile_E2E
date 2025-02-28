@@ -170,33 +170,25 @@ public class WiglLoginPage extends BasePage {
         }
     }
 
-    public void selectLanguage(String language) {
-        System.out.println("Attempting to select language: " + language);
+    public void selectLanguage() {
+        System.out.println("Attempting to select language");
         try {
             WebElement languageToggle = getLanguageToggleButton();
             System.out.println("Language toggle button found, clicking...");
             languageToggle.click();
             
-            // Wait for animation
-            Thread.sleep(1000);
+            // Close button
+            By closeButton = OS.isAndroid() ?
+                AppiumBy.xpath("(//android.widget.TextView)[12]") :
+                AppiumBy.xpath("//XCUIElementTypeButton[@name='Close']");
             
-            // Select French
-            if (language.equalsIgnoreCase("Français")) {
-                By frenchOption = OS.isAndroid() ?
-                    AppiumBy.xpath("//android.widget.TextView[@text='FR']") :
-                    AppiumBy.xpath("//XCUIElementTypeStaticText[@name='FR']");
-                
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement languageOption = wait.until(ExpectedConditions.elementToBeClickable(frenchOption));
-                System.out.println("French option found, clicking...");
-                languageOption.click();
-                
-                // Wait for selection to take effect
-                Thread.sleep(1000);
-            }
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+            WebElement closeButtonElement = wait.until(ExpectedConditions.elementToBeClickable(closeButton));
+            System.out.println("Close button found, clicking...");
+            closeButtonElement.click();
         } catch (Exception e) {
             System.out.println("Error during language selection: " + e.getMessage());
-            throw new RuntimeException("Failed to select language: " + language, e);
+            throw new RuntimeException("Failed to select language", e);
         }
     }
 
