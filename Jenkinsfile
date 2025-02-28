@@ -109,8 +109,8 @@ pipeline {
             steps {
                 script {
                     try {
-                        // Video kaydını başlat
-                        sh 'ffmpeg -f x11grab -s 1920x1080 -i :0.0 -r 30 -vcodec libx264 output.mp4 &'
+                        // OBS Studio ile video kaydını başlat
+                        sh 'obs --startrecording &'
 
                         def platformName = params.PLATFORM.toLowerCase()
                         echo "📂 Creating Test Directories..."
@@ -139,7 +139,7 @@ pipeline {
                         }
 
                         // Video kaydını durdur
-                        sh 'pkill ffmpeg'
+                        sh 'obs --stoprecording'
 
                         echo "📊 Checking Test Results:" 
                         sh """
