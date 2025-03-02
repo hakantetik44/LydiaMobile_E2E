@@ -56,24 +56,24 @@ public class BasePage {
 
     public void scrollAndSelectLanguage() {
         try {
-            // Wait for and click the language selector
+            // Attendre et cliquer sur le sélecteur de langue
             WebElement languageSelector = wait.until(ExpectedConditions.elementToBeClickable(getLanguageSelectorButton()));
             languageSelector.click();
 
-            // Wait for French option to be visible and click it
+            // Attendre que l'option française soit visible et cliquer dessus
             WebElement frenchOption = wait.until(ExpectedConditions.elementToBeClickable(getFrenchOption()));
             frenchOption.click();
 
-            // Optional: Wait for and click close button if needed
+            // Optionnel : Attendre et cliquer sur le bouton de fermeture si nécessaire
             try {
                 WebElement closeButton = wait.until(ExpectedConditions.elementToBeClickable(getCloseButton()));
                 closeButton.click();
             } catch (Exception e) {
-                System.out.println("Close button not found or not needed: " + e.getMessage());
+                System.out.println("Bouton de fermeture non trouvé ou non nécessaire : " + e.getMessage());
             }
 
         } catch (Exception e) {
-            System.out.println("Error during language selection: " + e.getMessage());
+            System.out.println("Erreur lors de la sélection de la langue : " + e.getMessage());
             throw e;
         }
     }
@@ -90,9 +90,9 @@ public class BasePage {
                 int endY;
                 
                 if (direction.equals("up")) {
-                    endY = (int) (dimension.getHeight() * 0.3); // Scroll up to 30% of screen height
+                    endY = (int) (dimension.getHeight() * 0.3); // Défilement vers le haut jusqu'à 30% de la hauteur de l'écran
                 } else {
-                    endY = (int) (dimension.getHeight() * 0.7); // Scroll down to 70% of screen height
+                    endY = (int) (dimension.getHeight() * 0.7); // Défilement vers le bas jusqu'à 70% de la hauteur de l'écran
                 }
                 
                 TouchAction touch = new TouchAction((PerformsTouchActions) driver);
@@ -102,9 +102,9 @@ public class BasePage {
                     .release()
                     .perform();
                 
-                Thread.sleep(1000); // Wait for animation
+                Thread.sleep(1000); // Attendre l'animation
             } else {
-                // For iOS, use the existing swipe gesture
+                // Pour iOS, utiliser le geste de balayage existant
                 try {
                     ((AppiumDriver) driver).executeScript(
                         "mobile: swipe",
@@ -115,7 +115,7 @@ public class BasePage {
                         )
                     );
                 } catch (Exception e) {
-                    // Fallback to coordinates-based swipe
+                    // Solution de repli pour le balayage basé sur les coordonnées
                     Dimension dimension = driver.manage().window().getSize();
                     Point location = element.getLocation();
                     Dimension elementSize = element.getSize();
@@ -137,11 +137,11 @@ public class BasePage {
                         )
                     );
                 }
-                Thread.sleep(1000); // Wait for animation
+                Thread.sleep(1000); // Attendre l'animation
             }
         } catch (Exception e) {
-            System.out.println("Error during scroll: " + e.getMessage());
-            throw new RuntimeException("Failed to perform scroll: " + e.getMessage(), e);
+            System.out.println("Erreur lors du défilement : " + e.getMessage());
+            throw new RuntimeException("Échec du défilement : " + e.getMessage(), e);
         }
     }
 
@@ -177,43 +177,43 @@ public class BasePage {
                 ((AppiumDriver) driver).executeScript("mobile: dragFromToForDuration", params);
             }
             
-            Thread.sleep(1500); // Wait for scroll animation
+            Thread.sleep(1500); // Attendre l'animation de défilement
         } catch (Exception e) {
-            System.out.println("Error during scroll up: " + e.getMessage());
-            throw new RuntimeException("Failed to perform scroll up: " + e.getMessage());
+            System.out.println("Erreur lors du défilement vers le haut : " + e.getMessage());
+            throw new RuntimeException("Échec du défilement vers le haut : " + e.getMessage());
         }
     }
 
     public void scrollWiglTextUp() {
         try {
-            // Find the specific TextView element
+            // Trouver l'élément TextView spécifique
             By wiglTextLocator = AppiumBy.xpath("//android.widget.TextView[@text=' on Wigl ✨']");
             WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(wiglTextLocator));
             
-            // Get the element's bounds
+            // Obtenir les limites de l'élément
             String[] bounds = element.getAttribute("bounds").replace("][", ",").replace("[", "").replace("]", "").split(",");
             int startX = (Integer.parseInt(bounds[0]) + Integer.parseInt(bounds[2])) / 2;
             int startY = (Integer.parseInt(bounds[1]) + Integer.parseInt(bounds[3])) / 2;
             
-            // Calculate end point (scroll up by 70% of the element's height)
+            // Calculer le point final (défilement vers le haut de 70% de la hauteur de l'élément)
             int endY = startY - (startY * 70 / 100);
             
             if (OS.isAndroid()) {
-                // Create touch input source
+                // Créer une source d'entrée tactile
                 PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
                 Sequence swipe = new Sequence(finger, 0);
                 
-                // Add touch interactions
+                // Ajouter des interactions tactiles
                 swipe.addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), startX, startY));
                 swipe.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
                 swipe.addAction(new Pause(finger, Duration.ofMillis(200)));
                 swipe.addAction(finger.createPointerMove(Duration.ofMillis(1000), PointerInput.Origin.viewport(), startX, endY));
                 swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
                 
-                // Perform the action
+                // Exécuter l'action
                 ((AppiumDriver) driver).perform(Arrays.asList(swipe));
             } else {
-                // For iOS
+                // Pour iOS
                 Map<String, Object> params = new HashMap<>();
                 params.put("duration", 1.0);
                 params.put("fromX", startX);
@@ -223,11 +223,11 @@ public class BasePage {
                 ((AppiumDriver) driver).executeScript("mobile: dragFromToForDuration", params);
             }
             
-            Thread.sleep(1500); // Wait for scroll animation
+            Thread.sleep(1500); // Attendre l'animation de défilement
             
         } catch (Exception e) {
-            System.out.println("Error during Wigl text scroll: " + e.getMessage());
-            throw new RuntimeException("Failed to scroll Wigl text: " + e.getMessage());
+            System.out.println("Erreur lors du défilement du texte Wigl : " + e.getMessage());
+            throw new RuntimeException("Échec du défilement du texte Wigl : " + e.getMessage());
         }
     }
 } 

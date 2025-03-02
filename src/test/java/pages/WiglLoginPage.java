@@ -78,30 +78,30 @@ public class WiglLoginPage extends BasePage {
 
     private WebElement getLanguageToggleButton() {
         if (OS.isAndroid()) {
-            // Using a more flexible locator for the language toggle button
+            // Utilisation d'un localisateur plus flexible pour le bouton de sélection de langue
             return driver.findElement(By.xpath("//android.widget.TextView[contains(@text, '󰅀')]"));
         } else {
-            // For iOS, we'll keep the existing logic
+            // Pour iOS, nous gardons la logique existante
             return driver.findElement(By.xpath("//XCUIElementTypeButton[@name='language-toggle-button']"));
         }
     }
 
     public void login(String email, String password) {
-        System.out.println("Entering email: " + email);
+        System.out.println("Saisie de l'email: " + email);
         WebElement emailField = driver.findElement(getEmailInput());
         emailField.click();
         emailField.clear();
         emailField.sendKeys(email);
         hideKeyboard();
 
-        System.out.println("Entering password: " + password);
+        System.out.println("Saisie du mot de passe: " + password);
         WebElement passwordField = driver.findElement(getPasswordInput());
         passwordField.click();
         passwordField.clear();
         passwordField.sendKeys(password);
         hideKeyboard();
 
-        System.out.println("Clicking login button");
+        System.out.println("Clic sur le bouton de connexion");
         driver.findElement(getLoginButton()).click();
     }
 
@@ -123,12 +123,12 @@ public class WiglLoginPage extends BasePage {
                     try {
                         driver.navigate().back();
                     } catch (Exception e2) {
-                        System.out.println("Could not hide keyboard via back button: " + e2.getMessage());
+                        System.out.println("Impossible de masquer le clavier via le bouton retour: " + e2.getMessage());
                     }
                 }
                 Thread.sleep(500);
             } catch (Exception e) {
-                System.out.println("Could not hide keyboard: " + e.getMessage());
+                System.out.println("Impossible de masquer le clavier: " + e.getMessage());
             }
         } else {
             try {
@@ -141,12 +141,12 @@ public class WiglLoginPage extends BasePage {
                         By emptyArea = AppiumBy.xpath("//XCUIElementTypeApplication");
                         driver.findElement(emptyArea).click();
                     } catch (Exception e2) {
-                        System.out.println("Could not hide iOS keyboard: " + e2.getMessage());
+                        System.out.println("Impossible de masquer le clavier iOS: " + e2.getMessage());
                     }
                 }
                 Thread.sleep(500);
             } catch (Exception e) {
-                System.out.println("Error while hiding iOS keyboard: " + e.getMessage());
+                System.out.println("Erreur lors du masquage du clavier iOS: " + e.getMessage());
             }
         }
     }
@@ -162,33 +162,33 @@ public class WiglLoginPage extends BasePage {
     public boolean areLanguageOptionsDisplayed() {
         try {
             WebElement languageToggle = getLanguageToggleButton();
-            System.out.println("Language toggle button found");
+            System.out.println("Bouton de sélection de langue trouvé");
             return languageToggle.isDisplayed();
         } catch (Exception e) {
-            System.out.println("Error checking language options visibility: " + e.getMessage());
+            System.out.println("Erreur lors de la vérification de la visibilité des options de langue: " + e.getMessage());
             return false;
         }
     }
 
     public void selectLanguage() {
-        System.out.println("Attempting to select language");
+        System.out.println("Tentative de sélection de la langue");
         try {
             WebElement languageToggle = getLanguageToggleButton();
-            System.out.println("Language toggle button found, clicking...");
+            System.out.println("Bouton de sélection de langue trouvé, clic en cours...");
             languageToggle.click();
             
-            // Close button
+            // Bouton de fermeture
             By closeButton = OS.isAndroid() ?
                 AppiumBy.xpath("(//android.widget.TextView)[12]") :
                 AppiumBy.xpath("//XCUIElementTypeButton[@name='Close']");
             
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
             WebElement closeButtonElement = wait.until(ExpectedConditions.elementToBeClickable(closeButton));
-            System.out.println("Close button found, clicking...");
+            System.out.println("Bouton de fermeture trouvé, clic en cours...");
             closeButtonElement.click();
         } catch (Exception e) {
-            System.out.println("Error during language selection: " + e.getMessage());
-            throw new RuntimeException("Failed to select language", e);
+            System.out.println("Erreur lors de la sélection de la langue: " + e.getMessage());
+            throw new RuntimeException("Échec de la sélection de la langue", e);
         }
     }
 
@@ -207,18 +207,18 @@ public class WiglLoginPage extends BasePage {
 
         while (attempt < maxAttempts && !success) {
             try {
-                // Use the new scroll method
+                // Utiliser la nouvelle méthode de défilement
                 scrollWiglTextUp();
                 success = true;
-                System.out.println("Successfully scrolled Wigl text up");
+                System.out.println("Défilement du texte Wigl vers le haut réussi");
             } catch (Exception e) {
-                System.out.println("Attempt " + (attempt + 1) + " failed: " + e.getMessage());
+                System.out.println("Tentative " + (attempt + 1) + " échouée: " + e.getMessage());
             }
             attempt++;
         }
 
         if (!success) {
-            throw new RuntimeException("Failed to scroll Wigl text up after " + maxAttempts + " attempts");
+            throw new RuntimeException("Échec du défilement du texte Wigl vers le haut après " + maxAttempts + " tentatives");
         }
     }
 
@@ -227,15 +227,15 @@ public class WiglLoginPage extends BasePage {
             By viewGroupLocator = AppiumBy.xpath("//android.view.ViewGroup[@bounds='[0,63][1080,1316]']");
             WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(viewGroupLocator));
             
-            // Scroll up by 30% of screen height
+            // Défilement vers le haut de 30% de la hauteur de l'écran
             scrollUp(element, 30);
             
-            // Wait for animation to complete
+            // Attendre que l'animation soit terminée
             Thread.sleep(1500);
             
         } catch (Exception e) {
-            System.out.println("Error scrolling ViewGroup: " + e.getMessage());
-            throw new RuntimeException("Failed to scroll ViewGroup up", e);
+            System.out.println("Erreur lors du défilement du ViewGroup: " + e.getMessage());
+            throw new RuntimeException("Échec du défilement du ViewGroup vers le haut", e);
         }
     }
 
@@ -244,28 +244,26 @@ public class WiglLoginPage extends BasePage {
             By welcomeTextLocator = AppiumBy.xpath("//android.widget.TextView[@text='Welcome|']");
             WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(welcomeTextLocator));
             
-            // Get initial position for verification
+            // Obtenir la position initiale pour vérification
             Point initialPosition = element.getLocation();
             
-            // Scroll up by 40% of screen height
+            // Défilement vers le haut de 40% de la hauteur de l'écran
             scrollUp(element, 40);
             
-            // Wait for animation to complete
+            // Attendre que l'animation soit terminée
             Thread.sleep(1500);
             
-            // Verify the scroll
-            element = driver.findElement(welcomeTextLocator);
+            // Vérifier que le défilement a fonctionné
             Point newPosition = element.getLocation();
-            
-            if (newPosition.getY() < initialPosition.getY()) {
-                System.out.println("Successfully scrolled Welcome text up from Y:" + initialPosition.getY() + " to Y:" + newPosition.getY());
-            } else {
-                throw new RuntimeException("Welcome text did not move up as expected");
+            if (newPosition.getY() >= initialPosition.getY()) {
+                throw new RuntimeException("Le défilement n'a pas déplacé l'élément vers le haut");
             }
             
+            System.out.println("Défilement du texte de bienvenue réussi");
+            
         } catch (Exception e) {
-            System.out.println("Error scrolling Welcome text: " + e.getMessage());
-            throw new RuntimeException("Failed to scroll Welcome text up", e);
+            System.out.println("Erreur lors du défilement du texte de bienvenue: " + e.getMessage());
+            throw new RuntimeException("Échec du défilement du texte de bienvenue vers le haut", e);
         }
     }
 } 

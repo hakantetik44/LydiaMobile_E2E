@@ -85,6 +85,13 @@ public class Driver {
                  .setAutomationName(ConfigReader.getProperty("ios.automation.name"))
                  .setBundleId(ConfigReader.getProperty("ios.bundle.id"))
                  .setNoReset(true);
+                 
+        iOSOptions.setCapability("usePrebuiltWDA", true);
+        iOSOptions.setCapability("showXcodeLog", true);
+        iOSOptions.setCapability("useNewWDA", false);
+        iOSOptions.setCapability("wdaStartupRetries", 4);
+        iOSOptions.setCapability("iosInstallPause", 8000);
+        iOSOptions.setCapability("wdaStartupRetryInterval", 20000);
 
         driverPool.set(new AppiumDriver(new URL(APPIUM_URL), iOSOptions));
     }

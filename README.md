@@ -12,60 +12,60 @@
 [![Java](https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=java)](https://www.java.com)
 [![Maven](https://img.shields.io/badge/Maven-3.8-red?style=for-the-badge&logo=apache-maven)](https://maven.apache.org)
 
-*Framework de tests automatisés pour l'application web et mobile Wigl*
+*Framework for automated testing of Wigl web and mobile applications*
 
-[📱 Documentation](#-à-propos) •
+[📱 About](#-about) •
 [🚀 Installation](#-installation) •
-[📊 Rapports](#-rapports) •
+[📊 Reports](#-reports) •
 [📞 Contact](#-contact)
 
 ---
 
 </div>
 
-## 💫 À propos
-Framework de tests end-to-end pour l'application Wigl. Cette suite de tests automatisés permet de valider le bon fonctionnement de :
-- 🌐 L'application web responsive
-- 📱 L'application mobile Android et iOS
-- 🔄 La synchronisation des données entre les plateformes
-- 🎮 Les fonctionnalités de gaming et récompenses
-- 💰 Le système de cashback et points de fidélité
+## 💫 About
+End-to-end testing framework for the Wigl application. This automated test suite validates the proper functioning of:
+- 🌐 The responsive web application
+- 📱 The Android and iOS mobile applications
+- 🔄 Data synchronization between platforms
+- 🎮 Gaming and rewards features
+- 💰 Cashback and loyalty points system
 
-## ⚡ Technologies Utilisées
-- 🌐 **Selenium** : Tests automatisés web
-- 📱 **Appium** : Tests automatisés mobile
-- 🥒 **Cucumber** : Spécifications BDD
-- ☕ **Java** : Langage de programmation
-- 🎯 **Maven** : Gestion des dépendances
-- 🧪 **JUnit** : Framework de test
-- 📊 **Allure** : Rapports de test
+## ⚡ Technologies Used
+- 🌐 **Selenium**: Automated web testing
+- 📱 **Appium**: Automated mobile testing
+- 🥒 **Cucumber**: BDD specifications
+- ☕ **Java**: Programming language
+- 🎯 **Maven**: Dependency management
+- 🧪 **JUnit**: Testing framework
+- 📊 **Allure**: Test reporting
 
-## 📋 Prérequis
+## 📋 Prerequisites
 
-### 🌐 Tests Web
+### 🌐 Web Tests
 - ☕ Java JDK 17
 - 🎯 Maven 3.8.x+
-- 🌐 Navigateurs :
+- 🌐 Browsers:
   - Chrome
   - Firefox
   - Safari
   - Edge
 
-### 📱 Tests Mobile
-- 💻 Node.js et npm
+### 📱 Mobile Tests
+- 💻 Node.js and npm
 - 📱 Appium 2.0+
 - 🤖 Android Studio & SDK
-- 🍎 Xcode (pour iOS)
+- 🍎 Xcode (for iOS)
 
 ## 🚀 Installation
 
-### 1. 📥 Cloner le repository
+### 1. 📥 Clone the repository
 ```bash
 git clone https://github.com/hakantetik44/WiglMobile_E2E.git
 cd WiglMobile_E2E
 ```
 
-### 2. 📦 Installer les dépendances
+### 2. 📦 Install dependencies
 ```bash
 mvn clean install
 ```
@@ -73,168 +73,161 @@ mvn clean install
 ### 3. ⚙️ Configuration
 
 #### 🌐 Web
-```properties
-webUrl=https://wigl.fr
-browser=chrome
-```
+Edit `src/test/resources/configuration.properties` to set web testing parameters.
 
 #### 📱 Mobile
-```properties
-# Android
-androidAppPackage=fr.wigl.app
-androidAppActivity=fr.wigl.app.MainActivity
-deviceName=emulator-5554
+Edit `src/test/resources/configuration.properties` to set mobile testing parameters:
 
-# iOS
-iosBundleId=fr.wigl.app
-iosDeviceName=iPhone 14
+##### Android Configuration
+```properties
+android.platform.name=Android
+android.platform.version=11
+android.device.name=sdk_gphone_x86
+android.udid=emulator-5554
+android.app.package=com.bps.wigl
+android.app.activity=com.bps.wigl.MainActivity
+android.no.reset=true
+android.auto.grant.permissions=true
+android.automation.name=UiAutomator2
 ```
 
-## ▶️ Exécution des Tests
+##### iOS Configuration
+```properties
+ios.platform.name=iOS
+ios.platform.version=18.3.1
+ios.device.name=iPhone
+ios.udid=your-device-udid
+ios.bundle.id=com.bps.wigl
+ios.automation.name=XCUITest
+```
 
-### 🎯 Tous les tests
+## ▶️ Running Tests
+
+### 🎯 All tests
 ```bash
 mvn clean test -Dcucumber.filter.tags="@all"
 ```
 
-### 🌐 Tests Web
+### 🌐 Web Tests
 ```bash
 mvn test -Dplatform=web -Dcucumber.filter.tags="@web"
 ```
 
-### 📱 Tests Mobile
+### 📱 Mobile Tests
 ```bash
 # Android
-mvn test -Dplatform=android -Dcucumber.filter.tags="@android"
+mvn test -DplatformName=android -Dcucumber.filter.tags="@android"
 
 # iOS
-mvn test -Dplatform=ios -Dcucumber.filter.tags="@ios"
+mvn test -DplatformName=ios -Dcucumber.filter.tags="@ios"
 ```
 
-### 🏷️ Tests par Module
+### 🏷️ Tests by Module
 ```bash
-# Tests de connexion
-mvn test -Dcucumber.filter.tags="@connexion"
+# Login tests
+mvn test -Dcucumber.filter.tags="@login"
 
-# Tests d'inscription
-mvn test -Dcucumber.filter.tags="@inscription"
+# Registration tests
+mvn test -Dcucumber.filter.tags="@registration"
 
-# Tests de paiement
-mvn test -Dcucumber.filter.tags="@paiement"
+# Payment tests
+mvn test -Dcucumber.filter.tags="@payment"
 ```
 
-## 📊 Rapports et Analyses
+## 📱 iOS Testing Specifics
 
-### 📈 Rapports Allure
-Les rapports Allure sont générés automatiquement dans `target/allure-results` et incluent :
-- Vue d'ensemble des tests
-- Captures d'écran des erreurs
-- Temps d'exécution détaillé
-- Métriques de qualité
-- Historique des exécutions
+### WebDriverAgent Setup
+For iOS testing, WebDriverAgent needs to be properly set up:
 
-Pour visualiser les rapports :
+1. Install WebDriverAgent:
+   ```bash
+   npm install -g appium
+   appium driver install xcuitest
+   ```
+
+2. Open WebDriverAgent in Xcode:
+   ```bash
+   open -a Xcode ~/.appium/node_modules/appium-xcuitest-driver/node_modules/appium-webdriveragent/WebDriverAgent.xcodeproj
+   ```
+
+3. Configure WebDriverAgent:
+   - Select the WebDriverAgentRunner scheme
+   - Choose your iOS device as the target
+   - Update the signing team to your Apple Developer account
+   - Build the project (⌘+B)
+
+4. Trust the developer certificate on your iOS device:
+   - Go to Settings > General > Device Management
+   - Select your Apple Developer account
+   - Tap "Trust"
+
+5. Run WebDriverAgentRunner directly on your device:
+   - Launch the WebDriverAgentRunner app on your device
+   - Ensure it's running before starting Appium tests
+
+## 🤖 Android Testing Specifics
+
+1. Set up Android SDK:
+   ```bash
+   sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3"
+   ```
+
+2. Create and start an emulator:
+   ```bash
+   avdmanager create avd -n test_device -k "system-images;android-30;google_apis;x86_64"
+   emulator -avd test_device
+   ```
+
+3. Install the Wigl app:
+   ```bash
+   adb install -r path/to/wigl.apk
+   ```
+
+4. Grant necessary permissions:
+   ```bash
+   adb shell pm grant com.bps.wigl android.permission.ACCESS_FINE_LOCATION
+   ```
+
+## 📊 Reports and Analysis
+
+### 📈 Allure Reports
+Allure reports are automatically generated in `target/allure-results` and include:
+- Test overview
+- Error screenshots
+- Detailed execution time
+- Quality metrics
+- Execution history
+
+To view the reports:
 ```bash
 allure serve target/allure-results
 ```
 
-### 📑 Rapports Cucumber
-Les rapports Cucumber sont disponibles dans `target/cucumber-reports` :
-- Rapports HTML interactifs
-- Rapports JSON pour intégration CI/CD
-- Rapports XML pour analyse de tendances
+### 📑 Cucumber Reports
+Cucumber reports are available in `target/cucumber-reports`:
+- Interactive HTML reports
+- JSON reports for CI/CD integration
+- XML reports for trend analysis
 
-Pour ouvrir le rapport HTML :
+To open the HTML report:
 ```bash
 open target/cucumber-reports/index.html
 ```
 
-### 📊 Métriques de Test
-- Taux de réussite par module
-- Temps d'exécution moyen
-- Couverture des fonctionnalités
-- Points sensibles identifiés
+## 🔄 Continuous Integration (CI/CD)
 
-## 🔄 Intégration Continue (CI/CD)
-
-### Jenkins Pipeline
-
-Le projet utilise Jenkins pour l'intégration et le déploiement continus. Le `Jenkinsfile` définit plusieurs stages :
-
-```groovy
-// Extrait du Jenkinsfile
-pipeline {
-    agent any
-    stages {
-        stage('Build') { ... }
-        stage('Test') { ... }
-        stage('Report') { ... }
-    }
-}
-```
-
-### 🔧 Configuration Jenkins
-
-1. **Prérequis Jenkins**
-   - Jenkins 2.375+ avec Pipeline plugin
-   - Plugins nécessaires :
-     - Maven Integration
-     - Cucumber Reports
-     - Allure Jenkins Plugin
-     - Android SDK
-     - Xcode Integration
-
-2. **Variables d'Environnement**
-   ```groovy
-   environment {
-       JAVA_HOME = '/usr/lib/jvm/java-11-openjdk'
-       ANDROID_HOME = '/opt/android-sdk'
-       XCODE_PATH = '/Applications/Xcode.app'
-   }
-   ```
-
-3. **Déclencheurs**
-   - Push sur la branche main
-   - Pull Requests
-   - Planification quotidienne (nightly builds)
-
-### 📊 Rapports Jenkins
-
-Le pipeline génère automatiquement :
-- Rapports Cucumber dans Jenkins
-- Tableaux de bord Allure
-- Couverture de code
-- Temps d'exécution des tests
-
-### 🔔 Notifications
-
-Configuration des notifications pour :
-- Slack
-- Email
-- Microsoft Teams
-
-Pour plus de détails, consultez le [Jenkinsfile](./Jenkinsfile) du projet.
-
-## 🌍 UTM Tracking
-- 🏢 **Source** : aareon_france
-- 💻 **Medium** : github
-- 📱 **Campaign** : web_mobile_testing
-- 🔄 **Content** : e2e_framework
+The project can be integrated with CI/CD systems like Jenkins for automated testing.
 
 ## 🤝 Contribution
-1. 🔀 Fork le projet
-2. 🌿 Créer une branche (`git checkout -b feature/AmazingFeature`)
-3. ✍️ Commit les changements (`git commit -m 'Add some AmazingFeature'`)
-4. 📤 Push vers la branche (`git push origin feature/AmazingFeature`)
-5. 🔍 Ouvrir une Pull Request
-
-## 📜 License
-Copyright © 2025 [Aareon France](https://www.aareon.fr/). Tous droits réservés.
+1. 🔀 Fork the project
+2. 🌿 Create a branch (`git checkout -b feature/AmazingFeature`)
+3. ✍️ Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. 📤 Push to the branch (`git push origin feature/AmazingFeature`)
+5. 🔍 Open a Pull Request
 
 ## 📞 Contact
-- 🌐 **Site Web** : [www.wigl.fr](https://wigl.fr)
-- 📧 **Email** : contact@wigl.fr
-- 💼 **LinkedIn** : [Wigl](https://www.linkedin.com/company/wigl)
+- 🌐 **Website**: [www.wigl.fr](https://wigl.fr)
+- 📧 **Email**: contact@wigl.fr
 
 <div align="center">
 
@@ -243,9 +236,6 @@ Copyright © 2025 [Aareon France](https://www.aareon.fr/). Tous droits réservé
 # 💎 WIGL 💰
 *Finance & Crypto Made Simple*
 
-*Développé avec ❤️ par l'équipe QA de Wigl*
-
-[![GitHub stars](https://img.shields.io/github/stars/hakantetik44/WiglMobile_E2E?style=social)](https://github.com/hakantetik44/WiglMobile_E2E/stargazers)
+*Developed with ❤️ by the Wigl QA Team*
 
 </div>
-# WiglMobile_E2E

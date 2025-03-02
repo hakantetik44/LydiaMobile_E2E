@@ -15,7 +15,7 @@ public class ConfigReader {
             properties.load(file);
             file.close();
         } catch (IOException e) {
-            System.out.println("Configuration file not found at: " + path);
+            System.out.println("Fichier de configuration non trouvé à l'emplacement : " + path);
         }
     }
 

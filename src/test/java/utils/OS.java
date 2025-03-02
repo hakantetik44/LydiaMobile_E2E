@@ -5,14 +5,14 @@ public class OS {
 
     public static boolean isAndroid() {
         if (OS == null) {
-            throw new RuntimeException("Platform is not specified! Please run with -DplatformName=android or -DplatformName=ios");
+            throw new RuntimeException("Plateforme non spécifiée ! Veuillez exécuter avec -DplatformName=android ou -DplatformName=ios");
         }
         return OS.equalsIgnoreCase("android");
     }
 
     public static boolean isIOS() {
         if (OS == null) {
-            throw new RuntimeException("Platform is not specified! Please run with -DplatformName=android or -DplatformName=ios");
+            throw new RuntimeException("Plateforme non spécifiée ! Veuillez exécuter avec -DplatformName=android ou -DplatformName=ios");
         }
         return OS.equalsIgnoreCase("ios");
     }

@@ -43,7 +43,7 @@ public class WiglLoginSteps {
     }
 
     @When("l'utilisateur sélectionne {string}")
-    public void l_utilisateur_sélectionne(String language) {
+    public void lUtilisateurSelectionne(String language) {
         loginPage.selectLanguage();
     }
 
@@ -52,43 +52,43 @@ public class WiglLoginSteps {
       //
     }
 
-    @When("user enters email {string} and password {string}")
-    public void userEntersEmailAndPassword(String email, String password) {
+    @When("l'utilisateur saisit l'email {string} et le mot de passe {string}")
+    public void lUtilisateurSaisitEmailEtMotDePasse(String email, String password) {
         loginPage.login(email, password);
     }
 
-    @And("user taps on the login button")
-    public void userTapsOnTheLoginButton() {
+    @And("l'utilisateur appuie sur le bouton de connexion")
+    public void lUtilisateurAppuieSurLeBoutonDeConnexion() {
         // Login button tap is handled in the login method
-        System.out.println("Login button tapped");
+        System.out.println("Bouton de connexion appuyé");
     }
 
-    @Then("user should see the home page")
-    public void userShouldSeeTheHomePage() {
+    @Then("l'utilisateur devrait voir la page d'accueil")
+    public void lUtilisateurDevraitVoirLaPageDAccueil() {
         // Verify home page elements are visible
-        Assert.assertNotNull("Cashback amount should be visible", loginPage.getCashbackValue());
-        Assert.assertNotNull("Crypto balance should be visible", loginPage.getCryptoBalanceValue());
+        Assert.assertNotNull("Le montant de cashback devrait être visible", loginPage.getCashbackValue());
+        Assert.assertNotNull("Le solde crypto devrait être visible", loginPage.getCryptoBalanceValue());
     }
 
-    @Then("user should see their cashback amount")
-    public void userShouldSeeTheirCashbackAmount() {
+    @Then("l'utilisateur devrait voir son montant de cashback")
+    public void lUtilisateurDevraitVoirSonMontantDeCashback() {
         String cashbackAmount = loginPage.getCashbackValue();
-        Assert.assertNotNull("Cashback amount should not be null", cashbackAmount);
-        System.out.println("Cashback amount displayed: " + cashbackAmount);
+        Assert.assertNotNull("Le montant de cashback ne devrait pas être nul", cashbackAmount);
+        System.out.println("Montant de cashback affiché: " + cashbackAmount);
     }
 
-    @And("user should see their crypto balance")
-    public void userShouldSeeTheirCryptoBalance() {
+    @And("l'utilisateur devrait voir son solde crypto")
+    public void lUtilisateurDevraitVoirSonSoldeCrypto() {
         String cryptoBalance = loginPage.getCryptoBalanceValue();
-        Assert.assertNotNull("Crypto balance should not be null", cryptoBalance);
-        System.out.println("Crypto balance displayed: " + cryptoBalance);
+        Assert.assertNotNull("Le solde crypto ne devrait pas être nul", cryptoBalance);
+        System.out.println("Solde crypto affiché: " + cryptoBalance);
     }
 
-    @Then("user should see an error message {string}")
-    public void userShouldSeeAnErrorMessage(String expectedError) {
+    @Then("l'utilisateur devrait voir un message d'erreur {string}")
+    public void lUtilisateurDevraitVoirUnMessageDErreur(String expectedError) {
         // Note: You'll need to add error message handling in WiglLoginPage
         // For now, this is a placeholder
-        System.out.println("Expected error message: " + expectedError);
+        System.out.println("Message d'erreur attendu: " + expectedError);
         // TODO: Implement error message verification once the locator is added to WiglLoginPage
     }
 } 

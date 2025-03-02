@@ -37,14 +37,14 @@ public class Hooks {
         // Démarrer l'application pour ce scénario
         startApplication();
 
-        // Allure environment bilgileri
-        Allure.addAttachment("Environment", "Browser: Chrome\n" +
-                "Environment: Production\n" +
-                "URL: https://agrifood.orisha.com\n" +
-                "Platform: Mac OS\n" +
-                "Language: French\n" +
-                "Test Framework: Cucumber\n" +
-                "Timestamp: " + java.time.Instant.now());
+        // Informations d'environnement pour Allure
+        Allure.addAttachment("Environnement", "Navigateur: Chrome\n" +
+                "Environnement: Production\n" +
+                "URL: https://wigl.fr\n" +
+                "Plateforme: Mac OS\n" +
+                "Langue: Français\n" +
+                "Framework de test: Cucumber\n" +
+                "Horodatage: " + java.time.Instant.now());
     }
 
     private void startApplication() {
@@ -73,7 +73,7 @@ public class Hooks {
         }
     }
 
-    @Given("l'application Les Residences est ouverte")
+    @Given("l'application Wigl est ouverte")
     public void verifierApplicationOuverte() {
         WebDriver driver = Driver.getDriver();
         if (driver == null) {
