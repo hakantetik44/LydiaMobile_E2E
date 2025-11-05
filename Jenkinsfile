@@ -1,4 +1,3 @@
-// groovy
 pipeline {
     agent any
 
@@ -255,7 +254,7 @@ pipeline {
                     ls -la target/allure-results || true
                 '''
 
-                # Move cucumber.json if present
+                // Move cucumber.json if present
                 sh '''
                     rm -rf target/cucumber-reports || true
                     mkdir -p target/cucumber-reports || true
