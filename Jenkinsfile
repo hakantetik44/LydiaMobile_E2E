@@ -19,9 +19,51 @@ pipeline {
         script {
           // Set Maven path from Jenkins tool installation
           env.PATH = "${tool 'maven'}/bin:${env.PATH}"
+
+          // Add npm global bin to PATH (for appium)
+          def npmGlobalBin = sh(returnStdout: true, script: 'npm config get prefix 2>/dev/null || echo "/usr/local"').trim()
+          env.PATH = "${npmGlobalBin}/bin:${env.PATH}"
+
+          echo "Updated PATH: ${env.PATH}"
         }
 
         sh 'mvn -v'
+        sh 'node -v || echo "Node.js not found"'
+        sh 'npm -v || echo "npm not found"'
+      }
+    }
+
+    stage('Setup Appium') {
+      when {
+        expression { params.PLATFORM != 'web' }
+      }
+      steps {
+        script {
+          echo "🔧 Checking Appium installation..."
+
+          def appiumExists = sh(returnStatus: true, script: 'which appium >/dev/null 2>&1') == 0
+
+          if (!appiumExists) {
+            echo "📦 Installing Appium globally..."
+            sh 'npm install -g appium@2.11.5 || true'
+            sh 'sleep 2'
+          } else {
+            echo "✅ Appium already installed"
+            sh 'appium --version'
+          }
+
+          // Install platform-specific drivers
+          def p = params.PLATFORM.toLowerCase()
+          if (p == 'ios') {
+            echo "📱 Installing XCUITest driver..."
+            sh 'appium driver install xcuitest || true'
+          } else if (p == 'android') {
+            echo "🤖 Installing UiAutomator2 driver..."
+            sh 'appium driver install uiautomator2 || true'
+          }
+
+          sh 'appium driver list --installed'
+        }
       }
     }
 
@@ -41,7 +83,7 @@ pipeline {
           sh '''
             nohup appium --log appium.log --relaxed-security --port 4723 > appium.out 2>&1 &
             echo $! > appium.pid
-            sleep 5
+            sleep 8
           '''
 
           // Verify Appium is running
@@ -50,7 +92,7 @@ pipeline {
             echo "✅ Appium server started successfully"
           } else {
             echo "⚠️ Appium may not be ready, checking logs..."
-            sh 'cat appium.out || true'
+            sh 'tail -50 appium.log || cat appium.out || echo "No logs found"'
           }
         }
       }
@@ -61,57 +103,53 @@ pipeline {
         script {
           def p = params.PLATFORM.toLowerCase()
 
-          echo "Vérification des prérequis pour la plateforme: ${p}"
+          echo "✓ Vérification des prérequis pour la plateforme: ${p}"
 
-          // Common checks
+          // Common checks - display warnings instead of failing
           sh '''
-            echo "-- PATH and basic tools --"
-            echo "which adb:"; which adb || true
-            echo "which xcrun:"; which xcrun || true
-            echo "which appium:"; which appium || true
-            echo "which allure:"; which allure || true
+            echo "-- Checking basic tools --"
+            if which adb >/dev/null 2>&1; then
+              echo "✅ adb found: $(which adb)"
+            else
+              echo "⚠️ adb not found (needed for Android)"
+            fi
+
+            if which xcrun >/dev/null 2>&1; then
+              echo "✅ xcrun found: $(which xcrun)"
+            else
+              echo "⚠️ xcrun not found (needed for iOS)"
+            fi
+
+            if which appium >/dev/null 2>&1; then
+              echo "✅ appium found: $(which appium)"
+              appium --version
+            else
+              echo "❌ appium not found"
+              exit 1
+            fi
+
+            if which allure >/dev/null 2>&1; then
+              echo "✅ allure found: $(which allure)"
+            else
+              echo "⚠️ allure not found (optional for report generation)"
+            fi
           '''
 
-          if (p == 'android') {
-            // Check adb presence
-            def adbExists = sh(returnStatus: true, script: 'which adb >/dev/null 2>&1') == 0
-            if (!adbExists) {
-              error("Prerequisite missing: 'adb' not found on PATH. Install Android SDK platform-tools on the agent.")
-            }
-
-            // Check Appium and UiAutomator2 driver
-            def appiumExists = sh(returnStatus: true, script: 'which appium >/dev/null 2>&1') == 0
-            if (!appiumExists) {
-              error("Prerequisite missing: 'appium' not found. Install Appium on the agent or configure it on Jenkins.")
-            }
-
-            // Check Appium driver list for uiautomator2
-            def driverCheckCmd = 'appium driver list --installed || true'
-            def installedDrivers = sh(returnStdout: true, script: driverCheckCmd).trim()
-            if (!installedDrivers.toLowerCase().contains('uiautomator2')) {
-              error("Appium UiAutomator2 driver not installed. Run 'appium driver install uiautomator2' on the agent.")
-            }
-
-          } else if (p == 'ios') {
-            // Check Xcode tools
+          if (p == 'ios') {
+            // Check iOS specific requirements
             def xcrunExists = sh(returnStatus: true, script: 'which xcrun >/dev/null 2>&1') == 0
             if (!xcrunExists) {
-              error("Prerequisite missing: 'xcrun' not found. Install Xcode command line tools on the agent.")
+              error("❌ iOS prerequisite missing: 'xcrun' not found. Install Xcode command line tools.")
             }
+            echo "✅ iOS prerequisites OK"
 
-            // Check Appium and XCUITest driver
-            def appiumExists = sh(returnStatus: true, script: 'which appium >/dev/null 2>&1') == 0
-            if (!appiumExists) {
-              error("Prerequisite missing: 'appium' not found. Install Appium on the agent or configure it on Jenkins.")
+          } else if (p == 'android') {
+            // Check Android specific requirements
+            def adbExists = sh(returnStatus: true, script: 'which adb >/dev/null 2>&1') == 0
+            if (!adbExists) {
+              error("❌ Android prerequisite missing: 'adb' not found. Install Android SDK platform-tools.")
             }
-
-            def driverCheckCmd = 'appium driver list --installed || true'
-            def installedDrivers = sh(returnStdout: true, script: driverCheckCmd).trim()
-            if (!installedDrivers.toLowerCase().contains('xcuitest')) {
-              error("Appium XCUITest driver not installed. Run 'appium driver install xcuitest' on the agent.")
-            }
-          } else {
-            echo "Web run selected - no native prechecks"
+            echo "✅ Android prerequisites OK"
           }
         }
       }
