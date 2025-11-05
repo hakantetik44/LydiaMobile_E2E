@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="src/test/resources/images/lydia-logo.svg" alt="Lydia Logo" width="400"/>
+<img src="https://media.licdn.com/dms/image/v2/D4E22AQEmeXTQXhK55Q/feedshare-shrink_800/feedshare-shrink_800/0/1719918648012?e=2147483647&v=beta&t=mrfVX-weqH5L2aP9oT0eKhvELdKuY4fCM_WMyhAIrO8" alt="Lydia et Sumeria Logo" width="800"/>
 
 # 🌟 Framework de Test E2E Lydia Mobile
 *La Solution de Paiement Mobile Leader en France - Depuis 2013*
