@@ -128,14 +128,6 @@ public class Hooks {
         }
     }
 
-    @Given("l'application Wigl est ouverte")
-    public void verifierApplicationOuverte() {
-        WebDriver driver = Driver.getDriver();
-        if (driver == null) {
-            throw new RuntimeException("L'application n'est pas démarrée!");
-        }
-        System.out.println("L'application est ouverte et prête pour le test.");
-    }
 
     @After
     public void tearDown(Scenario scenario) {
