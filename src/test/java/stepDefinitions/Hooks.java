@@ -10,7 +10,6 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import utils.ConfigReader;
 import utils.Driver;
-import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
@@ -19,7 +18,7 @@ public class Hooks {
     private String platform;
 
     @Before
-    public void setUp(Scenario scenario) throws IOException {
+    public void setUp(Scenario scenario) {
         this.scenario = scenario;
         this.platform = System.getProperty("platformName", ConfigReader.getProperty("platformName", "android")).toLowerCase();
         
@@ -28,11 +27,23 @@ public class Hooks {
         String originalName = scenario.getName();
         String newName = originalName + " - " + platformName;
         
+        // Configuration Allure
+        Allure.getLifecycle().updateTestCase(testResult -> {
+            testResult.setName(newName);
+        });
+
+        // Ajouter des labels Allure
+        Allure.label("platform", platform);
+        Allure.label("testType", "E2E");
+        Allure.label("layer", "UI");
+        Allure.epic("Lydia Mobile Application");
+        Allure.feature("Authentication & Help");
+
         // Ajouter des informations sur la plateforme
         scenario.log("Plateforme de test: " + platform.toUpperCase());
-        Allure.label("platform", platform);
-        Allure.description("Plateforme de test: " + platform.toUpperCase() + "\n" + newName);
-        
+        Allure.parameter("Platform", platform.toUpperCase());
+        Allure.parameter("Test Environment", "Production");
+
         System.out.println("\n🎬 === Nouveau Scénario Commence: " + newName + " ===");
         System.out.println("📱 Plateforme: " + platform);
 
@@ -50,16 +61,9 @@ public class Hooks {
         }
         
         // Démarrer l'application pour ce scénario
-        startApplication();
-
-        // Informations d'environnement pour Allure
-        Allure.addAttachment("Environnement", "Navigateur: Chrome\n" +
-                "Environnement: Production\n" +
-                "URL: https://wigl.fr\n" +
-                "Plateforme: Mac OS\n" +
-                "Langue: Français\n" +
-                "Framework de test: Cucumber\n" +
-                "Horodatage: " + java.time.Instant.now());
+        Allure.step("🚀 Démarrage de l'application " + platform.toUpperCase(), () -> {
+            startApplication();
+        });
     }
 
     private void forceCloseApp() {
@@ -136,53 +140,70 @@ public class Hooks {
     @After
     public void tearDown(Scenario scenario) {
         try {
+            String resultatTest = scenario.isFailed() ? "❌ ÉCHEC" : "✅ RÉUSSITE";
+
             if (scenario.isFailed()) {
-                try {
-                    WebDriver driver = Driver.getDriver();
-                    if (driver instanceof TakesScreenshot) {
-                        byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-                        String screenshotName = String.format("capture-erreur-%s-%s", platform, scenario.getName());
-                        scenario.attach(screenshot, "image/png", screenshotName);
-                        Allure.addAttachment(screenshotName, "image/png", new String(screenshot));
+                Allure.step("❌ Test échoué - Capture d'écran", () -> {
+                    try {
+                        WebDriver driver = Driver.getDriver();
+                        if (driver instanceof TakesScreenshot) {
+                            byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+                            String screenshotName = String.format("Échec-%s-%s", platform, scenario.getName());
+
+                            // Attacher à Cucumber
+                            scenario.attach(screenshot, "image/png", screenshotName);
+
+                            // Attacher à Allure avec input stream
+                            Allure.addAttachment(
+                                screenshotName,
+                                "image/png",
+                                new java.io.ByteArrayInputStream(screenshot),
+                                ".png"
+                            );
+                        }
+                    } catch (Exception e) {
+                        System.err.println("❌ Erreur lors de la capture d'écran: " + e.getMessage());
+                        Allure.addAttachment("Erreur Screenshot", e.getMessage());
                     }
-                } catch (Exception e) {
-                    System.err.println("Erreur lors de la capture d'écran: " + e.getMessage());
-                }
+                });
+            } else {
+                Allure.step("✅ Test réussi");
             }
             
-            String resultatTest = scenario.isFailed() ? "❌ ÉCHEC" : "✅ RÉUSSITE";
             System.out.println(String.format("\n🏁 === Scénario Terminé: %s ===", scenario.getName()));
             System.out.println(String.format("📊 Résultat: %s", resultatTest));
 
             scenario.log(String.format("Test terminé - Plateforme: %s, Résultat: %s", platform.toUpperCase(), resultatTest));
-            Allure.step(String.format("Test terminé - Plateforme: %s, Résultat: %s", platform.toUpperCase(), resultatTest));
+
         } finally {
-            // Forcer la fermeture de l'application
-            System.out.println("Fermeture forcée de l'application...");
-            
-            // Fermer l'application via ADB pour Android
-            forceCloseApp();
-            
-            try {
-                WebDriver driver = Driver.getDriver();
-                if (driver != null) {
-                    driver.quit();
+            Allure.step("🧹 Nettoyage", () -> {
+                // Forcer la fermeture de l'application
+                System.out.println("Fermeture forcée de l'application...");
+
+                // Fermer l'application via ADB pour Android
+                forceCloseApp();
+
+                try {
+                    WebDriver driver = Driver.getDriver();
+                    if (driver != null) {
+                        driver.quit();
+                    }
+                } catch (Exception e) {
+                    System.err.println("Erreur lors de la fermeture du driver: " + e.getMessage());
                 }
-            } catch (Exception e) {
-                System.err.println("Erreur lors de la fermeture du driver: " + e.getMessage());
-            }
-            
-            // S'assurer que le driver est complètement fermé et réinitialisé
-            Driver.closeDriver();
-            
-            // Attendre un peu pour s'assurer que l'application est bien fermée
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            
-            System.out.println("Application fermée avec succès.\n");
+
+                // S'assurer que le driver est complètement fermé et réinitialisé
+                Driver.closeDriver();
+
+                // Attendre un peu pour s'assurer que l'application est bien fermée
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+
+                System.out.println("Application fermée avec succès.\n");
+            });
         }
     }
 }

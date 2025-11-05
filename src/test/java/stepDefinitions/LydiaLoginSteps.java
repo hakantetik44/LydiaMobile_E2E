@@ -4,6 +4,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.And;
+import io.qameta.allure.Step;
 import org.junit.Assert;
 import pages.LydiaLoginPage;
 import utils.Driver;
@@ -20,6 +21,7 @@ public class LydiaLoginSteps {
         wait = new WebDriverWait(Driver.getDriver(), Duration.ofSeconds(20));
     }
 
+    @Step("✅ L'application Lydia est lancée")
     @Given("l'application Lydia est lancée")
     public void lApplicationLydiaEstLancee() {
         Assert.assertNotNull("Le driver devrait être initialisé", Driver.getDriver());
@@ -27,6 +29,7 @@ public class LydiaLoginSteps {
         wait.until(ExpectedConditions.elementToBeClickable(loginPage.getBesoinAideButton()));
     }
 
+    @Step("Clic sur le bouton : {bouton}")
     @When("l'utilisateur clique sur {string}")
     public void lUtilisateurCliqueSur(String bouton) {
         switch (bouton) {
@@ -44,6 +47,7 @@ public class LydiaLoginSteps {
         System.out.println("✅ Clic sur le bouton : " + bouton);
     }
 
+    @Step("Saisie du numéro de téléphone : {numero}")
     @And("l'utilisateur saisit le numéro {string}")
     public void lUtilisateurSaisitLeNumero(String numero) {
         wait.until(ExpectedConditions.elementToBeClickable(loginPage.getNumeroTelephoneInput()));
@@ -51,12 +55,14 @@ public class LydiaLoginSteps {
         System.out.println("✅ Numéro de téléphone saisi : " + numero);
     }
 
+    @Step("Saisie de l'email : {email}")
     @And("l'utilisateur saisit l'email {string}")
     public void lUtilisateurSaisitEmail(String email) {
         loginPage.saisirEmail(email);
         System.out.println("✅ Email saisi : " + email);
     }
 
+    @Step("✅ Envoi de la demande d'aide")
     @Then("l'utilisateur envoie la demande d'aide")
     public void lUtilisateurEnvoieLaDemandeDaide() {
         wait.until(ExpectedConditions.elementToBeClickable(loginPage.getEnvoyerButton()));
