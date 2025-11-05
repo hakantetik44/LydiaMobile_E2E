@@ -13,19 +13,44 @@ pipeline {
   stages {
     stage('Prepare') {
       steps {
-        echo "Preparing environment (minimal Jenkinsfile). Selected platform: ${params.PLATFORM}"
+        echo "Preparing environment for platform: ${params.PLATFORM}"
         sh 'java -version || true'
-        sh 'mvn -v || true'
+
+        script {
+          // Set Maven path from Jenkins tool installation
+          env.PATH = "${tool 'maven'}/bin:${env.PATH}"
+        }
+
+        sh 'mvn -v'
       }
     }
 
-    stage('Confirm') {
+    stage('Start Appium Server') {
+      when {
+        expression { params.PLATFORM != 'web' }
+      }
       steps {
         script {
-          // Ask for manual confirmation before running tests (useful when pipeline is triggered automatically)
-          def userInput = input id: 'ProceedOrAbort', message: "Confirmer l'exécution des tests pour la plateforme '${params.PLATFORM}' ?", parameters: [choice(name: 'ACTION', choices: ['Proceed','Abort'], description: 'Proceed to run tests or Abort')]
-          if (userInput == 'Abort') {
-            error('Build aborted by user at confirmation step')
+          echo "🚀 Starting Appium server on port 4723..."
+
+          // Kill any existing Appium process
+          sh 'pkill -f appium || true'
+          sh 'sleep 2'
+
+          // Start Appium server in background
+          sh '''
+            nohup appium --log appium.log --relaxed-security --port 4723 > appium.out 2>&1 &
+            echo $! > appium.pid
+            sleep 5
+          '''
+
+          // Verify Appium is running
+          def appiumStatus = sh(returnStatus: true, script: 'curl -s http://localhost:4723/status | grep -q "ready"')
+          if (appiumStatus == 0) {
+            echo "✅ Appium server started successfully"
+          } else {
+            echo "⚠️ Appium may not be ready, checking logs..."
+            sh 'cat appium.out || true'
           }
         }
       }
@@ -114,28 +139,39 @@ pipeline {
   post {
     always {
       script {
+        // Stop Appium server if it was started
+        echo "🛑 Stopping Appium server..."
         sh '''
-          echo "Listing target folder"
+          if [ -f appium.pid ]; then
+            kill $(cat appium.pid) 2>/dev/null || true
+            rm appium.pid
+          fi
+          pkill -f appium || true
+        '''
+
+        sh '''
+          echo "📂 Listing target folder"
           ls -la target || true
         '''
 
         archiveArtifacts artifacts: 'target/**/*', allowEmptyArchive: true
-        junit 'target/surefire-reports/**/*.xml'
+        junit testResults: 'target/surefire-reports/**/*.xml', allowEmptyResults: true
 
         // Try to generate Allure report if CLI is present
         sh '''
           if [ -d target/allure-results ]; then
             if command -v allure >/dev/null 2>&1; then
+              echo "📊 Generating Allure report..."
               allure generate target/allure-results --clean -o target/allure-report || true
             else
-              echo "Allure CLI not found, skipping generate - to install: https://docs.qameta.io/allure/"
+              echo "⚠️ Allure CLI not found, skipping generate"
             fi
           else
-            echo "No allure-results found"
+            echo "ℹ️ No allure-results found"
           fi
         '''
 
-        echo "Pipeline finished. Platform: ${params.PLATFORM}."
+        echo "✅ Pipeline finished. Platform: ${params.PLATFORM}."
       }
     }
 
